@@ -1,0 +1,120 @@
+  # - name: Install the dracut-fips package
+  #   yum:
+  #     name: dracut-fips
+  #     state: present
+  #
+  # - name: Check for AES-NI
+  #   command: cat /proc/cpuinfo
+  #   register: result
+  #   changed_when: false
+  #   check_mode: false
+  #
+  # - name: Install dracut-fips-aesni for AES-NI CPU
+  #   yum:
+  #     name: dracut-fips-aesni
+  #     state: present
+  #   when: result.stdout.find('aes') != -1
+  #
+  # - name: Check if prelink is installed
+  #   yum:
+  #     list: prelink
+  #   register: result
+  #   changed_when: false
+  #   check_mode: false
+  #
+  # - name: Turning off PRELINKING in /etc/sysconfig/prelink
+  #   lineinfile:
+  #     path: /etc/sysconfig/prelink
+  #     regexp: '^PRELINKING=yes'
+  #     line: 'PRELINKING=no'
+  #   when: (result.results|length == -1) or (result.results[1].yumstate == 'installed')
+  #
+  # - name: Run dracut to rebuild initramfs
+  #   command: dracut --force
+  #
+  #
+  # # - name: Edit the Kernel to include FIPS argument
+  # #   shell: 'grubby --update-kernel=$(grubby --default-kernel) --args=fips=1'
+  # #   register: grubby_cmd
+  # #   failed_when: grubby_cmd.rc != 0
+  # #
+  # # - name: Check for UUID and Set the boot argument
+  # #   shell: "uuid=$(findmnt -no uuid /boot) ; [[ -n $uuid ]] && grubby --update-kernel=$(grubby --default-kernel) --args=boot=UUID=${uuid}"
+  # #   register: boot_cmd
+  # #   failed_when: boot_cmd.rc != 0
+  # #
+  # # - name: Adding FIPS to the grub
+  # #   shell: "sed -i \'/^GRUB_CMDLINE_LINUX=/s/\"$/ fips=1\"/\' /etc/default/grub"
+  # #   when: ansible_distribution_major_version == "7"
+  # #
+  # # - name: Get UUID and set it in the grub
+  # #   shell: 'uuid=$(findmnt -no uuid /boot) ; [[ -n $uuid ]] && sed -i "/^GRUB_CMDLINE_LINUX=/s/\"$/ boot=UUID=${uuid}\"/" /etc/default/grub'
+  # #   when: ansible_distribution_major_version == "7"
+  #
+  # - name: Run grubby
+  #   command: grubby --default-kernel
+  #   register: result_grubby
+  #
+  # - name: Edit kernel command-line to include the fips 1 argument
+  #   shell: grubby --update-kernel={{result_grubby.stdout.strip}} --args=fips=1
+  #
+  # - name: Get boot_uuid
+  #   command: findmnt -no uuid /boot
+  #   register: result
+  #   changed_when: false
+  #   check_mode: false
+  #   failed_when: false
+  #   # Evaluate use ansible variable
+  #   # https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#information-discovered-from-systems-facts
+  #   # https://pastebin.com/9uxfDieU
+  # #
+  # - name: 'Edit kernel command-line to include the fips1 and boot=UUID=XXXX or boot=LABEL=XXXX or boot=/dev/DEVICE argument'
+  #   # command: grubby --update-kernel="{{result_grubby.stdout.strip}}" --args=boot=UUID="{{result.stdout.strip}}"
+  #   shell: 'grubby --update-kernel=DEFAULT --args="fips=1 boot=UUID={{ result.stdout }}"'
+  #   when: result.rc == 0
+  #   register: result
+
+
+---
+- name: 'Install dracut-fips'
+  package:
+    name: dracut-fips
+    state: present
+
+- name: 'Run dracut to rebuild initramfs'
+  command: dracut --force
+
+- name: 'Get boot_uuid'
+  command: 'findmnt -no uuid /boot'
+  register: result
+
+- name: 'Edit kernel command-line to include the fips=1 and boot=UUID=XXXX or boot=LABEL=XXXX or boot=/dev/DEVICE argument'
+  shell: 'grubby --update-kernel=DEFAULT --args="fips=1 boot=UUID={{ result.stdout }}"'
+  register: result
+
+- name: Reboot immediately if there was a change
+  shell: "sleep 5 && reboot"
+  async: 1
+  poll: 0
+  when: result is changed
+
+- name: Wait for the reboot to complete if there was a change
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300
+  when: result is changed
+
+- name: 'Verify FIPS enabled - If failed means the machine is not FIPS enabled'
+  shell: cat /proc/sys/crypto/fips_enabled | grep 1
+
+
+# - name: Read FIPS enabled file content
+#   slurp:
+#       src: /proc/sys/crypto/fips_enabled
+#   register: result
+#
+# - name: Assert FIPS is enabled
+#   assert:
+#       that: '{{ result["content"] | b64decode }} == 1'
