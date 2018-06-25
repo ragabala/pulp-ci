@@ -1,12 +1,12 @@
 - job-template:
-    name: 'kmo-pulp-{build_version}-fips'
+    name: 'raga-pulp-fips-{build_version}'
     node: 'rhel7-np'
     properties:
         - qe-ownership
     scm:
         - git:
           # url: htt:ps://github.com/pulp/pulp-ci.git
-            url: https://github.com/kersommoura/pulp-ci
+            url: https://github.com/ragabala/pulp-ci
             branches:
                 - '*/ci_fips'
             skip-tag: true
@@ -27,7 +27,7 @@
         - shell:
             !include-raw-escape:
                 - 'ssh-setup.sh'
-                - 'fips-setup.sh'
+
         - shell:
             !include-raw-escape:
                 - 'pulp-install.sh'

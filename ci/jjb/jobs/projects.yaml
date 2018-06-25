@@ -64,7 +64,7 @@
           pulp_version: '2.16'
     reverse_trigger: '{build_version}-dev'
     jobs:
-        - kmo-pulp-{build_version}-fips
+        - raga-pulp-fips-{build_version}
 
 - project:
     name: pulp-3-pypi
