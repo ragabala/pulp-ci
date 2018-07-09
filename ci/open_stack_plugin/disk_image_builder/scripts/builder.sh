@@ -1,7 +1,13 @@
+#!/bin/bash
+
+# Get the directory of where the script is located. This helps in setting up relative path to the 
+# user elements folder
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Export the elements path so diskimage-builder can find the jenkins-slave
 # element. The jenkins-slave element can be refered from here [1]
 # [1] https://github.com/quipucords/ci/tree/master/ansible/roles/nodepool/files/elements/jenkins-slave
-export ELEMENTS_PATH=$PWD/../elements
+export ELEMENTS_PATH=$DIR/../elements
 
 # Export the jenkins' public ssh key path in order to allow jenkins ssh into
 # the slaves. The jenkins public key must be present in the following location
@@ -18,8 +24,6 @@ export JENKINS_PUBLIC_SSH_KEY_PATH=~/.ssh/jenkins/id_rsa.pub
 # "template-f26-os.qcow2", "template-f27-os.qcow2" in whatever directory
 # you are in.
 ############################################################3
-
-
 # This is used by the bootloader element to insert values at boot time into grub
 # Comment this out for building Non Fips OS Images
 export DIB_BOOTLOADER_DEFAULT_CMDLINE="fips=1"
@@ -41,7 +45,9 @@ export DIB_BOOTLOADER_DEFAULT_CMDLINE="fips=1"
 # [1] https://github.com/openstack/diskimage-builder/tree/master/diskimage_builder/elements/rhel7
 
 # Path to where the RHEL7 base image is
-export DIB_LOCAL_IMAGE="$PWD/local_images/rhel-server-7.5-x86_64-kvm.qcow2"
+export DIB_LOCAL_IMAGE="$DIR/local_images/rhel-server-7.5-x86_64-kvm.qcow2"
+# semanage command is required for running
+sudo yum -y install policycoreutils-python-utils
 	
 # You can set the registration method for RHN with the environment variable
 # REG_METHOD. Valid values include "disable" and "enable"
@@ -61,5 +67,5 @@ export REG_POOL_ID=<RED_HAT_SUBSCRITPION_POOL_ID>
 export REG_METHOD=portal
 export REG_HALT_UNREGISTER=1
 
-disk-image-create -o template-rhel7-os rhel7 redhat-common rhel-common vm simple-init growroot jenkins-slave grub2 bootloader  epel
+disk-image-create -o template-rhel7-os rhel7 rhel-common vm simple-init growroot jenkins-slave bootloader  epel
 ##############################################################

@@ -88,6 +88,10 @@ Below are some extra notes about the phases we are currently using in this eleme
 Customizing the image to your needs is done with the help of variables. All the variables that are required for the elements
 are exported as environment variables before building the image using the diskimage builder. 
 
+for example: The bootloader element that steps up grub on the boot partition that allows setting up boot variables. This can be achieved by 
+exporting the DIB_BOOTLOADER_DEFAULT_CMDLINE with the key-value boot variable pairs.   
+
+## Phases
 
 ### extra-data.d
 
@@ -140,22 +144,45 @@ the diskimage-builder built in elements.
 ## Building Our Images
 
 We use the following elements for fedora images:
-     fedora-minimal -- DIB built in. says we want a fedora machine. Needs DIB_RELEASE to decide what version to use
-     vm             -- DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
-     simple-init    -- DIB built in. Network and system configuration that cannot be done until boot time
-     growroot       -- DIB built in. Grow the root partition on first boot.
-     jenkins-slave  -- Custom defined element found in this repo.
+     element        | description
+     ---            | ---        |
+     fedora-minimal | DIB built in. says we want a fedora machine. Needs DIB_RELEASE to decide what version to use
+     vm             | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
+     simple-init    | DIB built in. Network and system configuration that cannot be done until boot time
+     growroot       | DIB built in. Grow the root partition on first boot.
+     jenkins-slave  | Custom defined element found in this repo.
 
 We use the following elements for CentOS images:
-     centos7        -- DIB built in. Needs DIB_RELEASE to decide what version to use
-     vm             -- DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
-     simple-init    -- DIB built in. Network and system configuration that cannot be done until boot time
-     growroot       -- DIB built in. Grow the root partition on first boot.
-     epel           -- DIB built in.
-     jenkins-slave  -- Custom defined element found in this repo.
+     element        | description
+     ---            | ---        |
+     centos7        | DIB built in. Needs DIB_RELEASE to decide what version to use
+     vm             | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
+     simple-init    | DIB built in. Network and system configuration that cannot be done until boot time
+     growroot       | DIB built in. Grow the root partition on first boot.
+     epel           | DIB built in.
+     jenkins-slave  | Custom defined element found in this repo.
 
-The following shows how one might generate all our images that we currently use:
+We use the following elements for Rhel images:
+     element        | description
+     ---            | ---        |
+     rhel7             | DIB built in. Provides the base image for building rhel images. Needs DIB_LOCAL_IMAGE which points to the base image location(qcow2 images)
+     rhel-common       | DIB built in. Takes case of rhel subscription manager.Needs REG_USER,REG_PASSWORD,REG_POOL_ID for subscription.
+     vm                | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
+     simple-init       | DIB built in. Network and system configuration that cannot be done until boot time
+     growroot          | DIB built in. Grow the root partition on first boot.
+     jenkins-slave     | Custom defined element found in this repo.
+     bootloader        | DIB built in. Installs grub2 on boot partition. Used for setting boot parameters. Needs DIB_BOOTLOADER_DEFAULT_CMDLINE for boot variables
+     epel              | DIB built in. For Extra packages
 
+The script that is currently used for building images can be found at scripts/builder.sh. 
+
+### Setting up the image to be accessed via Jenkins
+
+An user jenkins with password jenkins is configured as a sudo user in the image, during the install.d phase of the element. This makes the image instances accesible
+with usernames and password.
+
+For jenkins to access this image's instance, ssh public keys of jenkins needs to be passed to the image. This could be specified in JENKINS_PUBLIC_SSH_KEY_PATH.
+The JENKINS_PUBLIC_SSH_KEY_PATH should point to id_rsa.pub file containing jenkins public keys, which should be present in the host machine.
 
 ## Uploading to Openstack
 
