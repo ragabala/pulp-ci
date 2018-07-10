@@ -11,3 +11,6 @@ redhat-lsb-core:
 redhat-rpm-config:
 vim:
 wget:
+ansible:
+attr:
+libselinux-python:
