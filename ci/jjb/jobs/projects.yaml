@@ -55,6 +55,20 @@
         - pulp-{build_version}-dev-{os}
 
 - project:
+    name: pulp-fips
+    os:
+      - 'rhel7'
+    build_version:
+      - 2-master:
+          pulp_version: '2.17'
+          reverse_trigger: '2-master'
+      - 2.16:
+          pulp_version: '2.16'
+    reverse_trigger: '{build_version}-dev'
+    jobs:
+        - pulp-{build_version}-fips-{os}
+
+- project:
     name: pulp-3-pypi
     os:
         - f26
