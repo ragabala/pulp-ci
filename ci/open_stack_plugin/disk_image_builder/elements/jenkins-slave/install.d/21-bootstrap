@@ -65,3 +65,6 @@ sudo cp ${PUBLIC_SSH_KEY_PATH} /home/jenkins/.ssh/authorized_keys
 sudo chmod 700 /home/jenkins/.ssh
 sudo chmod 600 /home/jenkins/.ssh/authorized_keys
 sudo chown -R jenkins:jenkins /home/jenkins/.ssh
+
+# Create a soft link from this home directory so that jenkins can use this
+sudo ln -s /home/jenkins /var/lib/jenkins

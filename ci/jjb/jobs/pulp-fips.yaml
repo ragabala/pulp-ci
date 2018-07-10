@@ -1,6 +1,6 @@
 - job-template:
-    name: 'pulp-{build_version}-dev-{os}'
-    node: '{os}-np'
+    name: 'pulp-{build_version}-fips-{os}'
+    node: '{os}-os'
     properties:
         - qe-ownership
     scm:
@@ -25,7 +25,7 @@
                 - 'ssh-setup.sh'
         - shell:
             !include-raw-escape:
-                - 'pulp-install.sh'
+                - 'pulp-fips-install.sh'
                 - 'pulp-coverage-setup.sh'
                 - 'pulp-smash-parameters.sh'
         - inject:
