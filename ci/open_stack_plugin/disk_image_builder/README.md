@@ -144,35 +144,38 @@ the diskimage-builder built in elements.
 ## Building Our Images
 
 We use the following elements for fedora images:
-     element        | description
-     ---            | ---        |
-     fedora-minimal | DIB built in. says we want a fedora machine. Needs DIB_RELEASE to decide what version to use
-     vm             | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
-     simple-init    | DIB built in. Network and system configuration that cannot be done until boot time
-     growroot       | DIB built in. Grow the root partition on first boot.
-     jenkins-slave  | Custom defined element found in this repo.
+
+ element        | description
+ ---------------| ---------------------------        
+ fedora-minimal | DIB built in. says we want a fedora machine. Needs DIB_RELEASE to decide what version to use
+ vm             | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
+ simple-init    | DIB built in. Network and system configuration that cannot be done until boot time
+ growroot       | DIB built in. Grow the root partition on first boot.
+ jenkins-slave  | Custom defined element found in this repo.
 
 We use the following elements for CentOS images:
-     element        | description
-     ---            | ---        |
-     centos7        | DIB built in. Needs DIB_RELEASE to decide what version to use
-     vm             | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
-     simple-init    | DIB built in. Network and system configuration that cannot be done until boot time
-     growroot       | DIB built in. Grow the root partition on first boot.
-     epel           | DIB built in.
-     jenkins-slave  | Custom defined element found in this repo.
+
+ element        | description
+ ---------------| ---------------------------   
+ centos7        | DIB built in. Needs DIB_RELEASE to decide what version to use
+ vm             | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
+ simple-init    | DIB built in. Network and system configuration that cannot be done until boot time
+ growroot       | DIB built in. Grow the root partition on first boot.
+ epel           | DIB built in.
+ jenkins-slave  | Custom defined element found in this repo.
 
 We use the following elements for Rhel images:
-     element        | description
-     ---            | ---        |
-     rhel7             | DIB built in. Provides the base image for building rhel images. Needs DIB_LOCAL_IMAGE which points to the base image location(qcow2 images)
-     rhel-common       | DIB built in. Takes case of rhel subscription manager.Needs REG_USER,REG_PASSWORD,REG_POOL_ID for subscription.
-     vm                | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
-     simple-init       | DIB built in. Network and system configuration that cannot be done until boot time
-     growroot          | DIB built in. Grow the root partition on first boot.
-     jenkins-slave     | Custom defined element found in this repo.
-     bootloader        | DIB built in. Installs grub2 on boot partition. Used for setting boot parameters. Needs DIB_BOOTLOADER_DEFAULT_CMDLINE for boot variables
-     epel              | DIB built in. For Extra packages
+
+ element        | description
+ ---------------| ---------------------------   
+ rhel7          | DIB built in. Provides the base image for building rhel images. Needs DIB_LOCAL_IMAGE which points to the base image location(qcow2 images)
+ rhel-common    | DIB built in. Takes case of rhel subscription manager.Needs REG_USER,REG_PASSWORD,REG_POOL_ID for subscription.
+ vm             | DIB built in. Sets up a partitioned disk (rather than building just one filesystem with no partition table).
+ simple-init    | DIB built in. Network and system configuration that cannot be done until boot time
+ growroot       | DIB built in. Grow the root partition on first boot.
+ jenkins-slave  | Custom defined element found in this repo.
+ bootloader     | DIB built in. Installs grub2 on boot partition. Used for setting boot parameters. Needs DIB_BOOTLOADER_DEFAULT_CMDLINE for boot variables
+ epel           | DIB built in. For Extra packages
 
 The script that is currently used for building images can be found at scripts/builder.sh. 
 
