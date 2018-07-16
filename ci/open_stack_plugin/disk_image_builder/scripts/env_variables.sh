@@ -1,0 +1,11 @@
+export OS_AUTH_URL="https://ci-rhos.centralci.eng.rdu2.redhat.com:13000/v2.0"
+export OS_TENANT_NAME="pulp-jenkins"
+export OS_USERNAME="pulp-jenkins"
+export OS_PASSWORD="xMa2iZ4tai"
+export OS_TENANT_ID="416de0943aec41548a614be4f0a4ce7e"
+export RHN_USERNAME="rhn-engineering-automation"
+export RHN_PASSWORD="BI9ek0VNqUSbIWWn"
+export RHN_SKU="MCT1550"
+export RHN_SKU_POOLID="8a85f9823f14fd96013f8b576dec48cd"
+export RHN_POOL='Employee SKU'
+export RHN_ATOMIC_POOLID='8a85f98153a7bdce0153aa46b4717ee6' 

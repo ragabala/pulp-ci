@@ -1,0 +1,23 @@
+- job-template:
+    name: 'disk-image-builder-base'
+    node: 'disk-image-builder'
+    properties:
+        - qe-ownership
+    scm:
+      - git:
+          url: https://github.com/ragabala/pulp-ci.git
+          branches:
+              - '*/disk_image_builder_glance'
+          skip-tag: true
+    wrappers:
+        - config-file-provider:
+            files:
+                - file-id: rhn_credentials
+                  variable: RHN_CREDENTIALS
+                - file-id: Open_Stack_Credentials
+                  variable: Open_Stack_Credentials
+
+    builders:
+        - shell:
+            !include-raw-escape:
+                - 'disk-image-builder.sh'
