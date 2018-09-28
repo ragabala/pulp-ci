@@ -90,8 +90,8 @@ remove_existing_image(){
 # param $2: OS version
 # param $3: OS identifier : `fips` or `common`
 
-    echo "removing ${1}_${2}_${3}_DIB_updated"
-    value="${1}_${2}_${3}_DIB_updated"
+    echo "removing ${1}_${2}_${3}_DIB_TEMP_updated"
+    value="${1}_${2}_${3}_DIB_TEMP_updated"
     get_image_id_from_name "${value}"
     if [[ "${_image_id_temp}" ]];then
         echo "deleting existing image ${_image_id_temp}"
@@ -112,7 +112,7 @@ upload_image(){
         echo >&2 "Image File ${temp} not created"
         exit 1
     fi
-    glance image-create --progress  --disk-format qcow2 --container-format bare --visibility private --file "${scripts_dir}/output_images/template-${1}${2}-os.qcow2" --name "${1}_${2}_${3}_DIB_updated"
+    glance image-create --progress  --disk-format qcow2 --container-format bare --visibility private --file "${scripts_dir}/output_images/template-${1}${2}-os.qcow2" --name "${1}_${2}_${3}_DIB_TEMP_updated"
     recreate_input_output_image_dirs
 }
 
