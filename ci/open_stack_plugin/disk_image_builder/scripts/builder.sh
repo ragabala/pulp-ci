@@ -109,10 +109,10 @@ upload_image(){
         exit 1
     fi
 
-    value="${1}_${2}_${3}_DIB_updated"
+    value="${1}_${2}_${3}_DIB_TEMP_updated"
     get_image_id_from_name "${value}"
     prev_image="${_image_id_temp}"
-    glance image-create --progress  --disk-format qcow2 --container-format bare --visibility private --file "${scripts_dir}/output_images/template-${1}${2}-os.qcow2" --name "${1}_${2}_${3}_DIB_updated"
+    glance image-create --progress  --disk-format qcow2 --container-format bare --visibility private --file "${scripts_dir}/output_images/template-${1}${2}-os.qcow2" --name "${1}_${2}_${3}_DIB_TEMP_updated"
 
     get_image_id_from_name "${value}"
     new_image="${_image_id_temp}"
@@ -208,7 +208,7 @@ build_rhel_fips_images(){
         export REG_POOL_ID="${RHN_SKU_POOLID}"
         export REG_METHOD=portal
         export IS_FIPS=true # This flag will set the necessary boot cmd line parameters in the install.d and finalise.d steps
-        disk-image-create -o "${scripts_dir}/output_images/template-${OS}${RELEASE}-os" rhel7 rhel-common simple-init vm growroot jenkins-slave bootloader epel
+        disk-image-create -o "${scripts_dir}/output_images/template-${OS}${RELEASE}-os" rhel7 simple-init vm growroot jenkins-slave bootloader epel
         upload_image "${OS}" "${RELEASE}" 'fips'
     done
 }
