@@ -11,9 +11,9 @@ init(){
     fi
 
     # Check whether Open Stack values are configured
-    if [[ (  -z "${OS_AUTH_URL}" ) || (  -z "${OS_TENANT_NAME}" ) || ( -z "${OS_USERNAME}" ) || ( -z "${OS_PASSWORD}"  ) ||  ( -z "${OS_TENANT_ID}" ) ]];then
-        echo >&2 "Image creation in openstack requires 'OS_AUTH_URL' 'OS_TENANT_NAME' and
-            'OS_USERNAME' 'OS_PASSWORD' and 'OS_TENANT_ID' set in the environment"
+    if [[ (  -z "${OS_AUTH_URL}" ) || (  -z "${OS_PROJECT_NAME}" ) || ( -z "${OS_USERNAME}" ) || ( -z "${OS_PASSWORD}"  ) ||  ( -z "${OS_USER_DOMAIN_NAME}" ) ]];then
+        echo >&2 "Image creation in openstack requires 'OS_AUTH_URL' 'OS_PROJECT_NAME' and
+            'OS_USERNAME' 'OS_PASSWORD' and 'OS_USER_DOMAIN_NAME' set in the environment"
         exit 1
     fi
 
@@ -73,7 +73,7 @@ get_image_id_from_name(){
 # Since many images can have the same name, We select the id from one of the images.
 # We use the ``./py_get_image_id`` python executable for getting the image id.
 # param $1: Image_name
-    _image_id_temp="$(${scripts_dir}/py_get_image_id ${1})"
+    _image_id_temp="$(${scripts_dir}/py_get_image_id.sh ${1})"
 }
 
 
@@ -86,7 +86,7 @@ download_base_image(){
     local temp="${1}_${2}"
     get_image_id_from_name "${!temp}"
     echo "downloading  ${_image_id_temp}"
-    glance image-download --progress --file  "${scripts_dir}/input_images/${1}_${2}_base.img" "${_image_id_temp}"
+    openstack image save --file  "${scripts_dir}/input_images/${1}_${2}_base.img" "${_image_id_temp}"
 }
 
 
@@ -95,7 +95,7 @@ remove_existing_image(){
 # param $1 : Image Id to be deleted
 
     echo "deleting existing image ${1}"
-    glance image-delete "${1}"
+    openstack image delete "${1}"
 }
 
 
@@ -112,23 +112,10 @@ upload_image(){
         exit 1
     fi
 
-    value="${1}_${2}_${3}_DIB_updated"
+    value="${1}_${2}_${3}_DIB_temp_updated"
+    openstack image create --disk-format qcow2 --container-format bare --private --file "${scripts_dir}/output_images/template-${1}${2}-os.qcow2"  "${value}"
     get_image_id_from_name "${value}"
-    prev_image="${_image_id_temp}"
-    glance image-create --progress  --disk-format qcow2 --container-format bare --visibility private --file "${scripts_dir}/output_images/template-${1}${2}-os.qcow2" --name "${1}_${2}_${3}_DIB_updated"
-
-    get_image_id_from_name "${value}"
-    new_image="${_image_id_temp}"
-
-    # If a newer image is present and it differs from the older image
-    # If there is a proper older image
-    # We delete the older image
-    if [ "${prev_image}" != "${new_image}" ]; then
-        if [ "${prev_image}" != "0" ]; then
-            remove_existing_image "${prev_image}"
-        fi
-    fi
-
+    echo "New Image : ${_image_id_temp}"
     recreate_input_output_image_dirs
 }
 
